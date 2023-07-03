@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Calculator {
 
     static File fileLog;
     static FileWriter fileWriter;
+    static Stack<String> logStack = new Stack<>();
+    static double backResult;
 
     public static void main(String[] args) {
 
-        fileLog = new File("log.txt");
+        fileLog = new File("C:\\startJavaAPI\\src\\main\\java\\ru\\log.txt");
         try {
             fileWriter = new FileWriter(fileLog, true);
             boolean work = true;
@@ -24,6 +27,7 @@ public class Calculator {
                 System.out.print("Введите второе число: ");
                 double d2 = Double.parseDouble(scanner.nextLine());
                 System.out.println("Выберите операцию: + - * /");
+                System.out.println("z - отмена последней операции");
                 System.out.println("! - выход из калькулятора");
                 char operator = scanner.next().charAt(0);
 
@@ -38,7 +42,16 @@ public class Calculator {
                     case '/' -> result = d1 / d2;
                     case '!' -> {
                         work = false;
-                        System.out.println("До свидания!");
+                        System.out.println("Закончено, удачи!");
+                    }
+                    case 'z' -> {
+                        if (!logStack.isEmpty()) {
+                            logStack.pop();
+                            System.out.println("Последняя операция отменена");
+                        } else {
+                            System.out.println("Нет операции для отмены.");
+                        }
+                        continue;
                     }
                     default -> {
                         System.out.println("Выберите правильный символ");
@@ -47,10 +60,11 @@ public class Calculator {
                 }
 
                 if (operator != '!') {
-                    String logResult = String.format("%f", result);
-                    fileWriter.write(logEntry + logResult);
+                    logStack.push(logEntry + result);
+                    fileWriter.write(logEntry + result);
                     fileWriter.write(System.lineSeparator());
                     fileWriter.flush();
+                    backResult = result;
                 }
 
                 System.out.printf("Результат: %f\n", result);
